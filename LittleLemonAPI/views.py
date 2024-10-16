@@ -63,7 +63,7 @@ def single_items(request, pk):
     
 
 @api_view(['GET', 'POST'])   
-#@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def managers(request):
     if request.method == 'GET':
         if request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
@@ -74,7 +74,7 @@ def managers(request):
     
     if request.method == 'POST':
         if request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
-            user_id = request.data.get('user_id')
+            user_id = request.data.get('id')
             user_name = request.data.get('username')
             if not user_id and not user_name:
                 return Response({"detail": "User ID or username required"}, status=status.HTTP_400_BAD_REQUEST)
