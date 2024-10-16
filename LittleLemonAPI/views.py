@@ -1,28 +1,38 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User, Group
+from django.core.paginator import Paginator, EmptyPage
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import MenuItem
 from .serializers import MenuItemSerializer, UserSerializer
 from django.db.models import Prefetch
 # Create your views here.
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def menu_items(request):
     if request.method == 'GET':
         items = MenuItem.objects.select_related('category').all()
         category_name = request.query_params.get('category')
         to_price = request.query_params.get('price')
         search = request.query_params.get('search')
+        perpage = request.query_params.get('perpage', default=10)
+        page = request.query_params.get('page', default=1)
+
         if category_name:
             items = items.filter(category__title=category_name)
         if to_price:
             items = items.filter(price__lte=to_price)
         if search:
             items = items.filter(title__icontains=search)
+
+        paginator = Paginator(items, per_page=perpage)
+        try:
+            items = paginator.page(number=page)
+        except EmptyPage:
+            items = []
         serializer = MenuItemSerializer(items, many=True)
         return Response(serializer.data)
     
@@ -37,7 +47,7 @@ def menu_items(request):
     
 
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def single_items(request, pk):
     items = get_object_or_404(MenuItem, pk=pk)
     if request.method == 'GET':
