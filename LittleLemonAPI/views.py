@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import MenuItem
 from .serializers import MenuItemSerializer, UserSerializer
-
+from django.db.models import Prefetch
 # Create your views here.
 
 @api_view(['GET', 'POST'])
@@ -44,10 +44,10 @@ def single_items(request, pk):
         serializer = MenuItemSerializer(items)
         return Response(serializer.data)
     
-    is_manager = request.user.groups.filter(name='Manager').exists() or request.user.is_superuser
+    is_manager_or_superuser = request.user.groups.filter(name='Manager').exists() or request.user.is_superuser
     
     if request.method == 'PUT':
-        if is_manager:
+        if is_manager_or_superuser:
             serializer = MenuItemSerializer(items, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -56,7 +56,7 @@ def single_items(request, pk):
         return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
     
     if request.method == 'DELETE':
-        if is_manager:
+        if is_manager_or_superuser:
             items.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
@@ -65,15 +65,17 @@ def single_items(request, pk):
 @api_view(['GET', 'POST'])   
 @permission_classes([IsAuthenticated])
 def managers(request):
+    is_manager_or_superuser = request.user.groups.filter(name='Manager').exists() or request.user.is_superuser
+
     if request.method == 'GET':
-        if request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
+        if is_manager_or_superuser:
             users = User.objects.filter(groups__name='Manager')
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
         return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
     
     if request.method == 'POST':
-        if request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
+        if is_manager_or_superuser:
             user_id = request.data.get('id')
             user_name = request.data.get('username')
             if not user_id and not user_name:
@@ -91,19 +93,72 @@ def managers(request):
 @permission_classes([IsAuthenticated])
 def single_manager(request, pk):
     user = get_object_or_404(User, id=pk)
+    is_manager_or_superuser = request.user.groups.filter(name='Manager').exists() or request.user.is_superuser
 
     if request.method == 'GET':
-        if request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
+        if is_manager_or_superuser:
+            if not user.groups.filter(name='Manager').exists():
+                return Response({"detail": "User not in manager group"}, status=status.HTTP_400_BAD_REQUEST)
             serializer = UserSerializer(user)
             return Response(serializer.data)
         return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == 'DELETE':
-        if request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
-            user = get_object_or_404(User, id=pk)
+        if is_manager_or_superuser:
             if user.groups.filter(name='Manager').exists():
                 manager_group = Group.objects.get(name='Manager')
                 user.groups.remove(manager_group)
                 return Response({"detail": "User removed from manager group"}, status=status.HTTP_204_NO_CONTENT)
             return Response({"detail": "User not in manager group"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+    
+
+@api_view(['GET', 'POST'])   
+@permission_classes([IsAuthenticated])
+def delivery_crew(request):
+    is_manager_or_superuser = request.user.groups.filter(name='Manager').exists() or request.user.is_superuser
+
+    if request.method == 'GET':
+        if is_manager_or_superuser:
+            users = User.objects.filter(groups__name='Delivery Crew')
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data)
+        return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+    
+    if request.method == 'POST':
+        if is_manager_or_superuser:
+            user_id = request.data.get('id')
+            user_name = request.data.get('username')
+            if not user_id and not user_name:
+                return Response({"detail": "User ID or username required"}, status=status.HTTP_400_BAD_REQUEST)
+            user = get_object_or_404(User, pk=user_id) if user_id else get_object_or_404(User, username=user_name)
+            if user.groups.filter(name='Delivery Crew').exists():
+                return Response({"detail": "User already in delivery crew group"}, status=status.HTTP_400_BAD_REQUEST)
+            delivery_crew_group = Group.objects.get(name='Delivery Crew')
+            user.groups.add(delivery_crew_group)
+            return Response({"detail": "User added to delivery crew group"}, status=status.HTTP_201_CREATED)
+        return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+    
+
+@api_view(['GET', 'DELETE'])   
+@permission_classes([IsAuthenticated])
+def single_delivery_crew(request, pk):
+    user = get_object_or_404(User, id=pk)
+    is_manager_or_superuser = request.user.groups.filter(name='Manager').exists() or request.user.is_superuser
+
+    if request.method == 'GET':
+        if is_manager_or_superuser:
+            if not user.groups.filter(name='Delivery Crew').exists():
+                return Response({"detail": "User not in delivery crew group"}, status=status.HTTP_400_BAD_REQUEST)
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+
+    if request.method == 'DELETE':
+        if is_manager_or_superuser:
+            if user.groups.filter(name='Delivery Crew').exists():
+                delivery_crew_group = Group.objects.get(name='Delivery Crew')
+                user.groups.remove(delivery_crew_group)
+                return Response({"detail": "User removed from delivery crew group"}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"detail": "User not in delivery crew group"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
