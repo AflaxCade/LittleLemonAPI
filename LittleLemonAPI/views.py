@@ -42,8 +42,11 @@ def single_items(request, pk):
         serializer = MenuItemSerializer(items)
         return Response(serializer.data)
     
+    # Check if user is a manager or superuser once for PUT/DELETE
+    is_manager = request.user.groups.filter(name='Manager').exists() or request.user.is_superuser
+    
     if request.method == 'PUT':
-        if request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
+        if is_manager:
             serializer = MenuItemSerializer(items, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -52,7 +55,7 @@ def single_items(request, pk):
         return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
     
     if request.method == 'DELETE':
-        if request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
+        if is_manager:
             items.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
