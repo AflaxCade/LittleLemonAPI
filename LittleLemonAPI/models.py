@@ -22,7 +22,7 @@ class MenuItem(models.Model):
     def __str__(self):
         return self.title
     
-class cart(models.Model):
+class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     menuitems = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
     quantity = models.SmallIntegerField(default=1)
@@ -36,7 +36,7 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     delivery_crew = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='delivery_crew', null=True)
     status = models.BooleanField(db_index=True, default=0)
-    total = models.DecimalField(max_digits=6, decimal_places=2)
+    total = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     date = models.DateTimeField(db_index=True, auto_now_add=True)
 
 class OrderItem(models.Model):
