@@ -182,8 +182,8 @@ def cart_menu_items(request):
     if not request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
 
         if request.method == 'GET':
-            # Get all cart items for the authenticated user
-            cart_items = Cart.objects.filter(user=user)
+            cart_items = Cart.objects.select_related('menuitems').filter(user=user)
+            #cart_items = Cart.objects.filter(user=user)
             serializer = CartSerializer(cart_items, many=True)
             return Response(serializer.data)
         
