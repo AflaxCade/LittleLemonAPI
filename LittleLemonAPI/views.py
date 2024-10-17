@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from .models import MenuItem
-from .serializers import MenuItemSerializer, UserSerializer
-from django.db.models import Prefetch
+from .models import MenuItem, Cart
+from .serializers import MenuItemSerializer, UserSerializer, CartSerializer
+
 # Create your views here.
 
 @api_view(['GET', 'POST'])
@@ -172,3 +172,49 @@ def single_delivery_crew(request, pk):
                 return Response({"detail": "User removed from delivery crew group"}, status=status.HTTP_204_NO_CONTENT)
             return Response({"detail": "User not in delivery crew group"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+    
+
+@api_view(['GET', 'POST', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def cart_menu_items(request):
+    user = request.user
+
+    if not request.user.groups.filter(name='Manager').exists() or request.user.is_superuser:
+
+        if request.method == 'GET':
+            # Get all cart items for the authenticated user
+            cart_items = Cart.objects.filter(user=user)
+            serializer = CartSerializer(cart_items, many=True)
+            return Response(serializer.data)
+        
+        if request.method == 'POST':
+            menuitem_id = request.data.get('menuitems_id')
+            menuitem = get_object_or_404(MenuItem, id=menuitem_id)
+
+            if Cart.objects.filter(user=user, menuitems=menuitem).exists():
+                return Response({"detail": "Item already in cart"}, status=status.HTTP_400_BAD_REQUEST)
+            quantity = int(request.data.get('quantity', 1))
+            if quantity < 1:
+                return Response({"detail": "Quantity must be at least 1"}, status=status.HTTP_400_BAD_REQUEST)
+            unit_price = round(menuitem.price, 2)
+            total_price = round(unit_price * quantity, 2)
+
+            serializer = CartSerializer(data={
+                'menuitems_id': menuitem.id,
+                'quantity': quantity,
+                'unit_price': unit_price,
+                'price': total_price
+            })
+            if serializer.is_valid():
+                serializer.save(user=user)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        if request.method == 'DELETE':
+            cart_items = Cart.objects.filter(user=request.user)
+            if not cart_items.exists():
+                return Response({"detail": "Cart is already empty"}, status=status.HTTP_404_NOT_FOUND)
+            cart_items.delete()
+            return Response({"detail": "All cart items delcleraed successfully"}, status=status.HTTP_204_NO_CONTENT)
+        
+    return Response({"detail": "Customers Only"}, status=status.HTTP_403_FORBIDDEN)
