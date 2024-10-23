@@ -33,7 +33,7 @@ class Cart(models.Model):
         unique_together = ('user', 'menuitems')
     
     def __str__(self):
-        return '{} - {}'.format(self.user, self.menuitems)
+        return f"Cart: {self.user.username} - {self.menuitems.title} (x{self.quantity})"
     
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -41,6 +41,11 @@ class Order(models.Model):
     status = models.BooleanField(db_index=True, default=0)
     total = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     date = models.DateTimeField(db_index=True, auto_now_add=True)
+
+    def __str__(self):
+        delivery_status = 'Assigned' if self.delivery_crew else 'Not Assigned'
+        order_status = 'Completed' if self.status else 'Pending'
+        return f"Order #{self.id} by {self.user.username} - {order_status}, Delivery: {delivery_status}, Total: ${self.total}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
@@ -51,3 +56,6 @@ class OrderItem(models.Model):
 
     class Meta:
         unique_together = ('order', 'menuitem')
+
+    def __str__(self):
+         return f"{self.quantity} x {self.menuitem.title} for Order #{self.order.id} - Unit Price: ${self.unit_price}, Total: ${self.price}"

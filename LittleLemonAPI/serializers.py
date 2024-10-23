@@ -42,3 +42,20 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['id', 'user', 'menuitems', 'menuitems_id', 'quantity', 'unit_price', 'price']
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    menuitem =  serializers.SlugRelatedField(slug_field='title', queryset=MenuItem.objects.all(), read_only=False)
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'menuitem', 'quantity', 'unit_price', 'price']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    orderitem_set = OrderItemSerializer(many=True, read_only=True)
+
+
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'delivery_crew', 'status', 'total', 'date', 'orderitem_set']

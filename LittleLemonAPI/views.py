@@ -1,12 +1,13 @@
-from django.shortcuts import render, get_object_or_404
+from django.db.models import Prefetch
 from django.contrib.auth.models import User, Group
+from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator, EmptyPage
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from .models import MenuItem, Cart
-from .serializers import MenuItemSerializer, UserSerializer, CartSerializer
+from .models import MenuItem, Cart, Order, OrderItem
+from .serializers import MenuItemSerializer, UserSerializer, CartSerializer,OrderItemSerializer, OrderSerializer
 
 # Create your views here.
 
@@ -216,3 +217,118 @@ def cart_menu_items(request):
             return Response({"detail": "Cart is already empty"}, status=status.HTTP_404_NOT_FOUND)
         cart_items.delete()
         return Response({"detail": "All cart items delcleraed successfully"}, status=status.HTTP_204_NO_CONTENT)
+    
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def orders(request):
+    user = request.user
+    perpage = request.query_params.get('perpage', default=10)
+    page = request.query_params.get('page', default=1)
+
+    if request.method == 'GET':
+        if user.groups.filter(name='Manager').exists() or user.is_superuser:
+            # Managers: Return all orders
+            orders = Order.objects.prefetch_related(
+                Prefetch('orderitem_set', queryset=OrderItem.objects.select_related('menuitem'))).all()
+            
+            order_status = request.query_params.get('status')
+            if order_status == 'delivered':
+                orders = orders.filter(status=True)
+            elif order_status == 'pending':
+                orders = orders.filter(status=False)
+        elif user.groups.filter(name='Delivery Crew').exists():
+            # Delivery crew: Return all orders assigned to this crew member
+            orders = Order.objects.prefetch_related(
+                Prefetch('orderitem_set', queryset=OrderItem.objects.select_related('menuitem'))
+                ).filter(delivery_crew=user, status=False)
+        else:
+            # Customers: Return orders created by this user
+            orders = Order.objects.prefetch_related(
+            Prefetch('orderitem_set', queryset=OrderItem.objects.select_related('menuitem'))).filter(user=user)
+
+        # Apply pagination to the orders
+        paginator = Paginator(orders, per_page=perpage)
+        try:
+            orders = paginator.page(number=page)
+        except EmptyPage:
+            orders = []
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+    
+    if request.method == 'POST':
+        if not user.groups.filter(name__in=['Manager', 'Delivery Crew']).exists() and not user.is_superuser:
+            # Get the cart items for this user
+            cart_items = Cart.objects.filter(user=user)
+            if not cart_items.exists():
+                return Response({"detail": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Create a new order for the user
+            order = Order.objects.create(user=user, total=0)
+
+            total_price = 0
+            # Create order items from the cart items
+            for item in cart_items:
+                order_item = OrderItem.objects.create(
+                    order=order,
+                    menuitem=item.menuitems,
+                    quantity=item.quantity,
+                    unit_price=item.unit_price,
+                    price=item.price
+                )
+                total_price += order_item.price
+
+            # Update the total price of the order
+            order.total = total_price
+            order.save()
+
+            # Clear the cart after creating the order
+            cart_items.delete()
+
+            return Response({"detail": "Order created successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+    
+
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def single_order(request, pk):
+    user = request.user
+    order = get_object_or_404(
+    Order.objects.prefetch_related('orderitem_set__menuitem').select_related('user', 'delivery_crew'), pk=pk)
+    # Check if the user is allowed to access this order
+    if request.method == 'GET':
+        # Customers: Only access their own orders
+        if not user.groups.filter(name__in=['Manager', 'Delivery Crew']).exists() and not user.is_superuser:
+            if order.user != user:
+                return Response({"detail": "Not authorized to view this order"}, status=status.HTTP_403_FORBIDDEN)
+        # Delivery Crew: Only access orders assigned to them
+        elif user.groups.filter(name='Delivery Crew').exists():
+            if order.delivery_crew != user:
+                return Response({"detail": "Not authorized to view this order"}, status=status.HTTP_403_FORBIDDEN)
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+    
+    elif request.method in ['PUT', 'PATCH']:
+        if user.groups.filter(name='Manager').exists() or user.is_superuser:
+            # Managers: Can update delivery crew and status
+            serializer = OrderSerializer(order, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        elif user.groups.filter(name='Delivery Crew').exists():
+            # Delivery Crew: Can only update order status
+            if 'status' not in request.data:
+                return Response({"detail": "Only status can be updated by delivery crew"}, status=status.HTTP_400_BAD_REQUEST)
+            order.status = request.data['status']
+            order.save()
+            return Response({"detail": "Order status updated successfully"}, status=status.HTTP_200_OK)
+
+    elif request.method == 'DELETE':
+        if user.groups.filter(name='Manager').exists() or user.is_superuser:
+            # Managers can delete orders
+            order.delete()
+            return Response({"detail": "Order deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
+    
