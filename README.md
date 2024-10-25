@@ -98,40 +98,11 @@ The API should now be available at http://127.0.0.1:8000.
 
 ### API Endpoints
 
-#### Authentication
-- **POST /api/auth/login/**: Obtain an authentication token.
-- **POST /api/auth/register/**: Register a new user (default to Customer role).
-
-#### Menu Management (Manager Only)
-- **GET /api/menu-items/**: List all menu items.
-- **POST /api/menu-items/**: Add a new menu item.
-- **PUT /api/menu-items/{id}/**: Update an existing menu item.
-- **DELETE /api/menu-items/{id}/**: Delete a menu item.
-
-#### Cart Management (Customer Only)
-- **GET /api/cart/menu-items/**: Retrieve items in the user's cart.
-- **POST /api/cart/menu-items/**: Add a menu item to the cart.
-- **DELETE /api/cart/menu-items/**: Clear all items from the cart.
-
-#### Order Management
-- **GET /api/orders/**: Retrieve orders based on user role.
-  - **Managers**: View all orders.
-  - **Delivery Crew**: View assigned orders.
-  - **Customers**: View own orders.
-- **POST /api/orders/**: Create a new order based on items in the cart (Customer only).
-- **GET /api/orders/{id}/**: Retrieve order details.
-- **PUT/PATCH /api/orders/{id}/**: Update order details (Manager only) or status (Delivery Crew).
-- **DELETE /api/orders/{id}/**: Delete an order (Manager only).
-
-## Usage
-
-### API Endpoints
-
 | Endpoint                         | Method         | Description                                                     | Access Level            |
 |----------------------------------|----------------|-----------------------------------------------------------------|-------------------------|
 | `/api/auth/login/`              | `POST`         | Obtain an authentication token.                                 | All Users               |
 | `/api/auth/register/`           | `POST`         | Register a new user (default to Customer role).                | All Users               |
-| `/api/menu-items/`              | `GET`          | List all menu items.                                          | Manager Only            |
+| `/api/menu-items/`              | `GET`          | List all menu items.                                          | All Users             |
 | `/api/menu-items/`              | `POST`         | Add a new menu item.                                          | Manager Only            |
 | `/api/menu-items/{id}/`         | `PUT`          | Update an existing menu item.                                 | Manager Only            |
 | `/api/menu-items/{id}/`         | `DELETE`       | Delete a menu item.                                          | Manager Only            |
