@@ -123,6 +123,28 @@ The API should now be available at http://127.0.0.1:8000.
 - **PUT/PATCH /api/orders/{id}/**: Update order details (Manager only) or status (Delivery Crew).
 - **DELETE /api/orders/{id}/**: Delete an order (Manager only).
 
+## Usage
+
+### API Endpoints
+
+| Endpoint                         | Method         | Description                                                     | Access Level            |
+|----------------------------------|----------------|-----------------------------------------------------------------|-------------------------|
+| `/api/auth/login/`              | `POST`         | Obtain an authentication token.                                 | All Users               |
+| `/api/auth/register/`           | `POST`         | Register a new user (default to Customer role).                | All Users               |
+| `/api/menu-items/`              | `GET`          | List all menu items.                                          | Manager Only            |
+| `/api/menu-items/`              | `POST`         | Add a new menu item.                                          | Manager Only            |
+| `/api/menu-items/{id}/`         | `PUT`          | Update an existing menu item.                                 | Manager Only            |
+| `/api/menu-items/{id}/`         | `DELETE`       | Delete a menu item.                                          | Manager Only            |
+| `/api/cart/menu-items/`         | `GET`          | Retrieve items in the user's cart.                           | Customer Only           |
+| `/api/cart/menu-items/`         | `POST`         | Add a menu item to the cart.                                 | Customer Only           |
+| `/api/cart/menu-items/`         | `DELETE`       | Clear all items from the cart.                               | Customer Only           |
+| `/api/orders/`                  | `GET`          | Retrieve orders based on user role.                          | All Users               |
+| `/api/orders/`                  | `POST`         | Create a new order based on items in the cart (Customer only).| Customer Only           |
+| `/api/orders/{id}/`             | `GET`          | Retrieve order details.                                      | All Users               |
+| `/api/orders/{id}/`             | `PUT/PATCH`    | Update order details (Manager only) or status (Delivery Crew).| Manager/Delivery Crew   |
+| `/api/orders/{id}/`             | `DELETE`       | Delete an order (Manager only).                              | Manager Only            |
+
+
 
 ## Contributing
 
