@@ -11,7 +11,6 @@ The **Little Lemon API** is a Django-based backend project designed to handle an
 - [Usage](#usage)
   - [API Endpoints](#api-endpoints)
   - [Sample Requests](#sample-requests)
-- [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -94,3 +93,41 @@ pip install -r requirements.txt
 python manage.py runserver
 ```
 The API should now be available at http://127.0.0.1:8000.
+
+## Usage
+
+### API Endpoints
+
+#### Authentication
+- **POST /api/auth/login/**: Obtain an authentication token.
+- **POST /api/auth/register/**: Register a new user (default to Customer role).
+
+#### Menu Management (Manager Only)
+- **GET /api/menu-items/**: List all menu items.
+- **POST /api/menu-items/**: Add a new menu item.
+- **PUT /api/menu-items/{id}/**: Update an existing menu item.
+- **DELETE /api/menu-items/{id}/**: Delete a menu item.
+
+#### Cart Management (Customer Only)
+- **GET /api/cart/menu-items/**: Retrieve items in the user's cart.
+- **POST /api/cart/menu-items/**: Add a menu item to the cart.
+- **DELETE /api/cart/menu-items/**: Clear all items from the cart.
+
+#### Order Management
+- **GET /api/orders/**: Retrieve orders based on user role.
+  - **Managers**: View all orders.
+  - **Delivery Crew**: View assigned orders.
+  - **Customers**: View own orders.
+- **POST /api/orders/**: Create a new order based on items in the cart (Customer only).
+- **GET /api/orders/{id}/**: Retrieve order details.
+- **PUT/PATCH /api/orders/{id}/**: Update order details (Manager only) or status (Delivery Crew).
+- **DELETE /api/orders/{id}/**: Delete an order (Manager only).
+
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any changes or additions.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
