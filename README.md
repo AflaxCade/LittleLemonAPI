@@ -100,8 +100,9 @@ The API should now be available at http://127.0.0.1:8000.
 
 | Endpoint                         | Method         | Description                                                     | Access Level            |
 |----------------------------------|----------------|-----------------------------------------------------------------|-------------------------|
-| `/api/auth/login/`              | `POST`         | Obtain an authentication token.                                 | All Users               |
-| `/api/auth/register/`           | `POST`         | Register a new user (default to Customer role).                | All Users               |
+| `/auth/token/login/`            | `POST`         | Obtain an authentication token.                                 | All Users               |
+| `/auth/users/`                  | `GET`          | List all users.                                                 | Manager Only            |
+| `/auth/users/`                  | `POST`         | Register a new user (default to Customer role).                | All Users               |
 | `/api/menu-items/`              | `GET`          | List all menu items.                                          | All Users             |
 | `/api/menu-items/`              | `POST`         | Add a new menu item.                                          | Manager Only            |
 | `/api/menu-items/{id}/`         | `PUT`          | Update an existing menu item.                                 | Manager Only            |
