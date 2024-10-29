@@ -119,7 +119,7 @@ The API should now be available at http://127.0.0.1:8000.
 
 ### Sample Requests
 
-### Login
+### 1. Login
 
 - **URL**: `/auth/token/login/`
 - **Method**: `POST`
@@ -133,7 +133,7 @@ The API should now be available at http://127.0.0.1:8000.
   ```
 - **Response**: Returns a access token upon successful authentication.
 
-### User registration
+### 2. User registration
 
 - **URL**: `/auth/users/`
 - **Method**: `POST`
@@ -148,7 +148,7 @@ The API should now be available at http://127.0.0.1:8000.
   ```
 - **Response**: Returns a message indicating success or failure.
 
-### Users
+### 3. Users
 
 - **URL**: `/auth/users/`
 - **Method**: `GET`
@@ -156,7 +156,7 @@ The API should now be available at http://127.0.0.1:8000.
 - **Request Headers**: Requires a valid access token.
 - **Response**: Returns a list of users in JSON format.
 
-### Menu items
+### 4. Menu items
 
 #### A. Fetch All Menu Items (Basic Request)
 
@@ -309,7 +309,7 @@ The API should now be available at http://127.0.0.1:8000.
   ]
   ```
 
-### Add menu item
+#### F. Add menu item
 
 - **URL**: `/api/menu-items`
 - **Method**: `POST`
@@ -336,8 +336,63 @@ The API should now be available at http://127.0.0.1:8000.
   }
   ```
 
+#### G. Fetch Single Menu Item
 
+- **URL**: `/api/menu-items/1`
+- **Method**: `GET`
+- **Query Params:** None
+- **Description**: Displays Single menu item.
+- **Response (200 OK):**
+  ```json
+    {
+        "id": 1,
+        "title": "Cheesecake",
+        "price": "5.99",
+        "featured": true,
+        "category": {
+            "id": 1,
+            "title": "Desserts",
+            "slug": "desserts"
+    }
+  ```
 
+#### H. PUT Request Examples
+
+- **URL**: `/api/menu-items/1`
+- **Method**: `PUT`
+- **Query Params:** None
+- **Description**: Update Menu Item (Manager or Superuser).
+- **Request Body:**
+  ```json
+    {
+    "title": "Margherita Pizza - Extra Cheese",
+    "price": "10.99",
+    "featured": true,
+    "category_id": 3
+  }
+  ```
+- **Response (200 OK):**
+  ```json
+    {
+    "id": 30,
+    "title": "Margherita Pizza - Extra Cheese",
+    "price": "10.99",
+    "featured": true,
+    "category": {
+        "id": 3,
+        "title": "Main",
+        "slug": "main"
+    }
+  }
+  ```
+
+#### H. DELETE Request Examples
+
+- **URL**: `/api/menu-items/1`
+- **Method**: `DELETE`
+- **Query Params:** None
+- **Description**: Delete Menu Item (Manager or Superuser).
+- **Response (204 No Content):**
 
 ## Contributing
 
