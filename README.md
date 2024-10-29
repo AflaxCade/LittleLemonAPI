@@ -112,10 +112,41 @@ The API should now be available at http://127.0.0.1:8000.
 | `/api/cart/menu-items`         | `DELETE`       | Clear all items from the cart.                               | Customer Only           |
 | `/api/orders`                  | `GET`          | Retrieve orders based on user role.                          | All Users               |
 | `/api/orders`                  | `POST`         | Create a new order based on items in the cart (Customer only).| Customer Only           |
-| `/api/orders/{id}/`             | `GET`          | Retrieve order details.                                      | All Users               |
+| `/api/orders/{id}`             | `GET`          | Retrieve order details.                                      | All Users               |
 | `/api/orders/{id}`             | `PUT/PATCH`    | Update order details (Manager only) or status (Delivery Crew).| Manager/Delivery Crew   |
 | `/api/orders/{id}`             | `DELETE`       | Delete an order (Manager only).                              | Manager Only            |
 
+
+### Sample Requests
+
+### Login
+
+- **URL**: `/auth/token/login/`
+- **Method**: `POST`
+- **Description**: Authenticates users and generates a token.
+- **Request Body**:
+  ```json
+  {
+      "username": "admin",
+      "password": "admin"
+  }
+  ```
+- **Response**: Returns a access token upon successful authentication.
+
+### User registration
+
+- **URL**: `/auth/users`
+- **Method**: `POST`
+- **Description**: Creates a new user.
+- **Request Body**:
+  ```json
+  {
+      "username": "string",
+      "password": "string",
+      "email": "string"
+  }
+  ```
+- **Response**: Returns a message indicating success or failure.
 
 
 ## Contributing
