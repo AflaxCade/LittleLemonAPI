@@ -135,7 +135,7 @@ The API should now be available at http://127.0.0.1:8000.
 
 ### User registration
 
-- **URL**: `/auth/users`
+- **URL**: `/auth/users/`
 - **Method**: `POST`
 - **Description**: Creates a new user.
 - **Request Body**:
@@ -147,6 +147,167 @@ The API should now be available at http://127.0.0.1:8000.
   }
   ```
 - **Response**: Returns a message indicating success or failure.
+
+### Users
+
+- **URL**: `/auth/users/`
+- **Method**: `GET`
+- **Description**: Displays list of all user or current user.
+- **Request Headers**: Requires a valid access token.
+ - **Response**: Returns a list of users in JSON format.
+
+### Menu items
+
+#### A. Fetch All Menu Items (Basic Request)
+
+- **URL**: `/api/menu-items`
+- **Method**: `GET`
+- **Query Params:** None
+- **Description**: Displays list of menum items.
+- **Response (200 OK):**
+  ```json
+  [
+    {
+        "id": 1,
+        "title": "Cheesecake",
+        "price": "5.99",
+        "featured": true,
+        "category": {
+            "id": 1,
+            "title": "Desserts",
+            "slug": "desserts"
+        }
+    },
+    {
+        "id": 2,
+        "title": "Chocolate Cake",
+        "price": "4.99",
+        "featured": true,
+        "category": {
+            "id": 1,
+            "title": "Desserts",
+            "slug": "desserts"
+        }
+    }
+  ]
+  ```
+
+#### B. Filter by Category
+
+- **URL**: `/api/menu-items?category=Appetizers`
+- **Method**: `GET`
+- **Response (200 OK):**
+  ```json
+  [
+    {
+        "id": 10,
+        "title": "Bruschetta",
+        "price": "6.99",
+        "featured": true,
+        "category": {
+            "id": 4,
+            "title": "Appetizers",
+            "slug": "appetizers"
+        }
+    },
+    {
+        "id": 11,
+        "title": "Garlic Bread",
+        "price": "4.50",
+        "featured": false,
+        "category": {
+            "id": 4,
+            "title": "Appetizers",
+            "slug": "appetizers"
+        }
+    }
+  ]
+  ```
+
+#### C. Filter by Price
+
+- **URL**: `/api/menu-items?price=4`
+- **Method**: `GET`
+- **Response (200 OK):**
+  ```json
+  [
+    {
+          "id": 4,
+          "title": "Lemonade",
+          "price": "2.50",
+          "featured": true,
+          "category": {
+              "id": 2,
+              "title": "Beverages",
+              "slug": "beverages"
+          }
+      },
+      {
+          "id": 3,
+          "title": "Apple Pie",
+          "price": "3.99",
+          "featured": false,
+          "category": {
+              "id": 1,
+              "title": "Desserts",
+              "slug": "desserts"
+          }
+      }
+  ]
+  ```
+
+#### D. Search by Title
+
+- **URL**: `/api/menu-items?search=Pancakes`
+- **Method**: `GET`
+- **Response (200 OK):**
+  ```json
+  [
+    {
+        "id": 20,
+        "title": "Pancakes",
+        "price": "6.99",
+        "featured": true,
+        "category": {
+            "id": 1,
+            "title": "Desserts",
+            "slug": "desserts"
+        }
+    }
+  ]
+  ```
+
+### E. Pagination
+
+- **URL**: `/api/menu-items?page=3`
+- **Method**: `GET`
+- **Response (200 OK):**
+  ```json
+  [
+    {
+        "id": 21,
+        "title": "Waffles",
+        "price": "7.99",
+        "featured": true,
+        "category": {
+            "id": 1,
+            "title": "Desserts",
+            "slug": "desserts"
+        }
+    },
+    {
+        "id": 22,
+        "title": "Vegetable Stir Fry",
+        "price": "9.99",
+        "featured": false,
+        "category": {
+            "id": 3,
+            "title": "Main",
+            "slug": "main"
+        }
+    }
+  ]
+  ```
 
 
 ## Contributing
