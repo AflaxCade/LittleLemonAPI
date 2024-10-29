@@ -319,19 +319,22 @@ The API should now be available at http://127.0.0.1:8000.
   ```json
     {
       "title": "Cheeseburger",
-      "price": 8.49,
-      "category": 3
+      "price": 6.99,
+      "featured": true,
+      "category_id": 3
   }
   ```
 - **Response (201 Created):**
   ```json
   {
-      "id": 32,
+      "id": 35,
       "title": "Cheeseburger",
-      "price": 8.49,
+      "price": 6.99,
+      "featured": true,
       "category": {
         "id": 3,
-        "title": "Burger"
+        "title": "Main",
+        "slug": "main"
     }
   }
   ```
