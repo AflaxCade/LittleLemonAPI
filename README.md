@@ -154,7 +154,7 @@ The API should now be available at http://127.0.0.1:8000.
 - **Method**: `GET`
 - **Description**: Displays list of all user or current user.
 - **Request Headers**: Requires a valid access token.
- - **Response**: Returns a list of users in JSON format.
+- **Response**: Returns a list of users in JSON format.
 
 ### Menu items
 
@@ -308,6 +308,35 @@ The API should now be available at http://127.0.0.1:8000.
     }
   ]
   ```
+
+### Add menu item
+
+- **URL**: `/api/menu-items`
+- **Method**: `POST`
+- **Description**:Add a New Menu Item (Manager or Superuser).
+- **Request Headers**: Requires a access token.
+- **Request Body**:
+  ```json
+    {
+      "title": "Cheeseburger",
+      "price": 8.49,
+      "category": 3
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+      "id": 32,
+      "title": "Cheeseburger",
+      "price": 8.49,
+      "category": {
+        "id": 3,
+        "title": "Burger"
+    }
+  }
+  ```
+
+
 
 
 ## Contributing
