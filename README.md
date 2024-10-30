@@ -133,6 +133,7 @@ The API should now be available at http://127.0.0.1:8000.
   ```
 - **Response**: Returns a access token upon successful authentication.
 
+
 ### 2. User registration
 
 - **URL**: `/auth/users/`
@@ -148,6 +149,7 @@ The API should now be available at http://127.0.0.1:8000.
   ```
 - **Response**: Returns a message indicating success or failure.
 
+
 ### 3. Users
 
 - **URL**: `/auth/users/`
@@ -155,6 +157,7 @@ The API should now be available at http://127.0.0.1:8000.
 - **Description**: Displays list of all user or current user.
 - **Request Headers**: Requires a valid access token.
 - **Response**: Returns a list of users in JSON format.
+
 
 ### 4. Menu items
 
@@ -389,13 +392,88 @@ The API should now be available at http://127.0.0.1:8000.
   }
   ```
 
-#### H. DELETE Request Examples
+#### H. DELETE Menu Item
 
 - **URL**: `/api/menu-items/1`
 - **Method**: `DELETE`
 - **Query Params:** None
 - **Description**: Delete Menu Item (Manager or Superuser).
 - **Response (204 No Content):**
+
+
+### 5. Cart
+
+#### A. Fetch All Items in Cart (Authorized User)
+
+- **URL**: `/api/cart/menu-items`
+- **Method**: `GET`
+- **Description**: Displays list of All Items in Cart if current user already have items in the cart.
+- **Request Headers**: Requires a access token.
+- **Response (200 OK):**
+  ```json
+  [
+   {
+        "id": 13,
+        "user": 5,
+        "menuitems": {
+            "id": 1,
+            "title": "Cheesecake",
+            "price": "5.99"
+        },
+        "quantity": 2,
+        "unit_price": "5.99",
+        "price": "11.98"
+    },
+    {
+        "id": 14,
+        "user": 5,
+        "menuitems": {
+            "id": 2,
+            "title": "Chocolate Cake",
+            "price": "4.99"
+        },
+        "quantity": 4,
+        "unit_price": "4.99",
+        "price": "19.96"
+    }
+  ]
+
+#### B. Add Item to Cart (Authorized User)
+
+- **URL**: `/api/cart/menu-items`
+- **Method**: `POST`
+- **Description**:Add Item to Cart for current user.
+- **Request Headers**: Requires a access token.
+- **Request Body**:
+  ```json
+  {
+    "menuitems_id": 3,
+    "quantity": 1
+  }
+  ```
+- **Response (201 Created):**
+  ```json
+  {
+      "id": 15,
+      "user": 5,
+      "menuitems": {
+          "id": 3,
+          "title": "Apple Pie",
+          "price": "3.99"
+      },
+      "quantity": 1,
+      "unit_price": "3.99",
+      "price": "3.99"
+  }
+  ```
+
+#### C. Delete All Items in Cart (Authorized User)
+
+- **URL**: `/api/cart/menu-items`
+- **Method**: `DELETE`
+- **Description**: Successfully Delete All Items in Cart for the current user.
+- **Response (204 No Content):**
+
 
 ## Contributing
 
