@@ -90,7 +90,7 @@ def managers(request):
             user_id = request.data.get('id')
             user_name = request.data.get('username')
             if not user_id and not user_name:
-                return Response({"detail": "User ID or username required"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": "User ID and username required"}, status=status.HTTP_400_BAD_REQUEST)
             user = get_object_or_404(User, pk=user_id) if user_id else get_object_or_404(User, username=user_name)
             if user.groups.filter(name='Manager').exists():
                 return Response({"detail": "User already in manager group"}, status=status.HTTP_400_BAD_REQUEST)
@@ -141,7 +141,7 @@ def delivery_crew(request):
             user_id = request.data.get('id')
             user_name = request.data.get('username')
             if not user_id and not user_name:
-                return Response({"detail": "User ID or username required"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"detail": "User ID and username required"}, status=status.HTTP_400_BAD_REQUEST)
             user = get_object_or_404(User, pk=user_id) if user_id else get_object_or_404(User, username=user_name)
             if user.groups.filter(name='Delivery Crew').exists():
                 return Response({"detail": "User already in delivery crew group"}, status=status.HTTP_400_BAD_REQUEST)
@@ -324,7 +324,8 @@ def single_order(request, pk):
             order.status = request.data['status']
             order.save()
             return Response({"detail": "Order status updated successfully"}, status=status.HTTP_200_OK)
-
+        else:
+            return Response({"detail": "Not authorized"}, status=status.HTTP_403_FORBIDDEN)
     elif request.method == 'DELETE':
         if user.groups.filter(name='Manager').exists() or user.is_superuser:
             # Managers can delete orders
