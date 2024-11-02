@@ -475,6 +475,134 @@ The API should now be available at http://127.0.0.1:8000.
 - **Response (204 No Content):**
 
 
+### 6. Orders
+
+#### A. Fetch All Orders depending on the role of the user like Customer, Delivery Crew, and Manager or Superuser.
+
+- **URL**: `/api/orders`
+- **Method**: `GET`
+- **Description**: Displays list of All Orders.
+- **Request Headers**: Requires a access token.
+- **Response (200 OK):**
+  ```json
+  [
+    {
+        "id": 1,
+        "user": 6,
+        "delivery_crew": 4,
+        "status": false,
+        "total": "14.50",
+        "date": "2024-10-19T12:22:16.149974Z",
+        "orderitem_set": [
+            {
+                "id": 1,
+                "menuitem": "Lemonade",
+                "quantity": 4,
+                "unit_price": "2.50",
+                "price": "10.00"
+            },
+            {
+                "id": 2,
+                "menuitem": "Iced Tea",
+                "quantity": 2,
+                "unit_price": "2.25",
+                "price": "4.50"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "user": 5,
+        "delivery_crew": 7,
+        "status": false,
+        "total": "35.93",
+        "date": "2024-10-19T13:18:06.683494Z",
+        "orderitem_set": [
+            {
+                "id": 3,
+                "menuitem": "Cheesecake",
+                "quantity": 2,
+                "unit_price": "5.99",
+                "price": "11.98"
+            },
+            {
+                "id": 4,
+                "menuitem": "Chocolate Cake",
+                "quantity": 4,
+                "unit_price": "4.99",
+                "price": "19.96"
+            },
+            {
+                "id": 5,
+                "menuitem": "Apple Pie",
+                "quantity": 1,
+                "unit_price": "3.99",
+                "price": "3.99"
+            }
+        ]
+    }
+  ]
+  ```
+
+#### B. Fetch Only Pending or Delivered Orders by filtering
+
+- **URL**: `/api/orders?status=pending`
+- **URL**: `/api/orders?status=delivered`
+- **Method**: `GET`
+- **Description**: Displays list of All Orders based on the filter(only managers).
+- **Query Params:** Yes
+- **Request Headers**: Requires a access token.
+- **Response (200 OK):**
+
+#### C. Fetch Orders with Pagination
+
+- **URL**: `/api/orders?page=2`
+- **Method**: `GET`
+- **Description**: Displays list of All Orders of the page 2 if there is or returns empty data.
+- **Query Params:** Yes
+- **Request Headers**: Requires a access token.
+- **Response (200 OK):**
+
+#### D. Create an Order (Only Authorized Customer)
+
+ **URL**: `/api/orders`
+- **Method**: `POST`
+- **Description**:Successfully Creatse an Order for current user.
+- **Request Headers**: Requires a access token.
+- **Request Body**: The body should be empty, you don't need to provide any data in the request body, the `POST` request for order creation retrieves items directly from the user's cart.
+- **Response (201 Created):**
+
+#### E. Manager Updating Order Details using PUT or PATCH Requests.
+
+- **URL**: `/api/orders/1`
+- **Method**: `PUT` or 'PATCH'
+- **Query Params:** None
+- **Description**: Update status of the Order or assign to delivery crew (Manager or Superuser).
+- **Request Body:**
+  ```json
+  {
+    "delivery_crew": 7,
+    "status": true
+  }
+  ```
+- **Response (200 OK):**
+
+#### F. Delivery Crew Member Updating Only the Order Status.
+
+- **URL**: `/api/orders/1`
+- **Method**: `PUT` or 'PATCH'
+- **Query Params:** None
+- **Description**: Updates the status of the Order.
+- **Request Body:**
+  ```json
+  {
+    "status": true
+  }
+  ```
+- **Response (200 OK):**
+
+
+
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any changes or additions.
