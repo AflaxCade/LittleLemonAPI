@@ -115,6 +115,14 @@ The API should now be available at http://127.0.0.1:8000.
 | `/api/orders/{id}`             | `GET`          | Retrieve order details.                                      | All Users               |
 | `/api/orders/{id}`             | `PUT/PATCH`    | Update order details (Manager only) or status (Delivery Crew).| Manager/Delivery Crew   |
 | `/api/orders/{id}`             | `DELETE`       | Delete an order (Manager only).                              | Manager Only            |
+| `/api/manager/users`             | `GET`          | Retrieve all users in the Manager group.                        | Manager Only            |
+| `/api/manager/users`             | `POST`         | Add a user to the Manager group.                                | Manager Only            |
+| `/api/manager/users/{id}`        | `GET`          | Retrieve details of a specific Manager group user.              | Manager Only            |
+| `/api/manager/users/{id}`        | `DELETE`       | Remove a user from the Manager group.                           | Manager Only            |
+| `/api/delivery-crew/users`       | `GET`          | Retrieve all users in the Delivery Crew group.                  | Manager Only            |
+| `/api/delivery-crew/users`       | `POST`         | Add a user to the Delivery Crew group.                          | Manager Only            |
+| `/api/delivery-crew/users/{id}`  | `GET`          | Retrieve details of a specific Delivery Crew user.              | Manager Only            |
+| `/api/delivery-crew/users/{id}`  | `DELETE`       | Remove a user from the Delivery Crew group.                     | Manager Only            |
 
 
 ### Sample Requests
@@ -567,7 +575,7 @@ The API should now be available at http://127.0.0.1:8000.
 
  **URL**: `/api/orders`
 - **Method**: `POST`
-- **Description**:Successfully Creatse an Order for current user.
+- **Description**:Successfully Creates an Order for current user.
 - **Request Headers**: Requires a access token.
 - **Request Body**: The body should be empty, you don't need to provide any data in the request body, the `POST` request for order creation retrieves items directly from the user's cart.
 - **Response (201 Created):**
@@ -601,6 +609,135 @@ The API should now be available at http://127.0.0.1:8000.
   ```
 - **Response (200 OK):**
 
+
+### 7. Managers group
+
+#### A. Fetch All Managers(Manager or Superuser)
+
+- **URL**: `/api/groups/manager/users`
+- **Method**: `GET`
+- **Description**: Displays list of All Users in the Manager group.
+- **Request Headers**: Requires a access token.
+- **Response (200 OK):**
+  ```json
+  [
+     {
+        "id": 2,
+        "username": "johndoe",
+        "email": "john@little.lemon",
+        "date_joined": "2024-10-15"
+    },
+    {
+        "id": 3,
+        "username": "janedoe",
+        "email": "jane@little.lemon",
+        "date_joined": "2024-10-15"
+    }
+  ]
+  ```
+
+  #### B. Get single managaer user(Manager or Superuser)
+
+- **URL**: `/api/groups/manager/users/1`
+- **Method**: `GET`
+- **Description**: Displays a single user in the Manager group.
+- **Request Headers**: Requires a access token.
+- **Response (200 OK):**
+  ```json
+  {
+      "id": 2,
+      "username": "johndoe",
+      "email": "john@little.lemon",
+      "date_joined": "2024-10-15"
+  }
+  ```
+
+#### C. Add user to the manager group
+
+ **URL**: `/api/groups/manager/users`
+- **Method**: `POST`
+- **Description**:Successfully Adds a user to the manager group.
+- **Request Headers**: Requires a access token.
+- **Request Body**:
+```json
+{
+  "id": 3
+}
+```
+- **Response (201 Created):**
+
+#### D. Remove user from manager group
+
+ **URL**: `/api/groups/manager/users/2`
+- **Method**: `DELETE`
+- **Description**:Removes a user from manager group.
+- **Request Headers**: Requires a access token.
+- **Response (- 204 No Content):**
+
+
+### 8. Delivery crew group
+
+#### A. Fetch All Delivery crews(Manager or Superuser)
+
+- **URL**: `/api/groups/delivery-crew/users`
+- **Method**: `GET`
+- **Description**: Displays list of All Users in the Delivery crew group.
+- **Request Headers**: Requires a access token.
+- **Response (200 OK):**
+  ```json
+  [
+     {
+        "id": 4,
+        "username": "mikedoe",
+        "email": "mike@little.lemon",
+        "date_joined": "2024-10-15"
+    },
+    {
+        "id": 7,
+        "username": "alexdoe",
+        "email": "alex@little.lemon",
+        "date_joined": "2024-10-16"
+    }
+  ]
+  ```
+
+  #### B. Get single Delivery crew(Manager or Superuser)
+
+- **URL**: `/api/groups/manager/users/1`
+- **Method**: `GET`
+- **Description**: Displays a single user in the Delivery crew group.
+- **Request Headers**: Requires a access token.
+- **Response (200 OK):**
+  ```json
+  {
+      "id": 4,
+      "username": "mikedoe",
+      "email": "mike@little.lemon",
+      "date_joined": "2024-10-15"
+  }
+  ```
+
+#### C. Add user to the Delivery crew group
+
+ **URL**: `/api/groups/manager/users`
+- **Method**: `POST`
+- **Description**:Successfully Adds a user to the manager group.
+- **Request Headers**: Requires a access token.
+- **Request Body**:
+```json
+{
+  "id": 2
+}
+```
+- **Response (201 Created):**
+
+#### D. Remove user from manager group
+
+ **URL**: `/api/groups/manager/users/2`
+- **Method**: `DELETE`
+- **Description**:Removes a user from manager group.
+- **Request Headers**: Requires a access token.
+- **Response (- 204 No Content):**
 
 
 ## Contributing
