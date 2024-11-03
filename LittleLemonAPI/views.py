@@ -88,9 +88,8 @@ def managers(request):
     if request.method == 'POST':
         if is_manager_or_superuser:
             user_id = request.data.get('id')
-            user_name = request.data.get('username')
-            if not user_id and not user_name:
-                return Response({"detail": "User ID and username required"}, status=status.HTTP_400_BAD_REQUEST)
+            if not user_id:
+                return Response({"detail": "User ID required"}, status=status.HTTP_400_BAD_REQUEST)
             user = get_object_or_404(User, pk=user_id) if user_id else get_object_or_404(User, username=user_name)
             if user.groups.filter(name='Manager').exists():
                 return Response({"detail": "User already in manager group"}, status=status.HTTP_400_BAD_REQUEST)
@@ -139,9 +138,8 @@ def delivery_crew(request):
     if request.method == 'POST':
         if is_manager_or_superuser:
             user_id = request.data.get('id')
-            user_name = request.data.get('username')
-            if not user_id and not user_name:
-                return Response({"detail": "User ID and username required"}, status=status.HTTP_400_BAD_REQUEST)
+            if not user_id:
+                return Response({"detail": "User ID required"}, status=status.HTTP_400_BAD_REQUEST)
             user = get_object_or_404(User, pk=user_id) if user_id else get_object_or_404(User, username=user_name)
             if user.groups.filter(name='Delivery Crew').exists():
                 return Response({"detail": "User already in delivery crew group"}, status=status.HTTP_400_BAD_REQUEST)
